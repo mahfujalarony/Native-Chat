@@ -1,0 +1,39 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Backend build outputs
+backend/dist/
+backend/tsconfig.build.tsbuildinfo
+
+# Frontend build outputs & Expo
+frontend/.expo/
+frontend/dist/
+frontend/web-build/
+frontend/*.tsbuildinfo
+
+# Environment variables & secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/.env
+frontend/.env
+
+# Native build folders (if any)
+frontend/android/
+frontend/ios/
+
+# Logs & temporary files
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# CI / Deploy package temp
+deploy-pkg/

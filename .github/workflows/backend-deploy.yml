@@ -1,0 +1,73 @@
+name: Build and Deploy Backend to Azure Web App
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**' # শুধুমাত্র ব্যাকএন্ড কোড পরিবর্তন হলে চলবে
+      - '.github/workflows/backend-deploy.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend # ব্যাকএন্ড ফোল্ডারে এক্সিকিউট হবে
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies & Build
+        run: |
+          npm ci
+          npm run build --if-present
+
+      - name: Prepare Deployment Artifact
+        run: |
+          mkdir -p ../deploy-pkg
+          cp -r dist ../deploy-pkg/
+          cp package.json ../deploy-pkg/
+          cp package-lock.json ../deploy-pkg/
+          cd ../deploy-pkg
+          npm ci --omit=dev
+
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-app
+          path: deploy-pkg/
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-app
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'native-chat-backend' # আপনার Azure Web App এর নাম
+          package: .
