@@ -23,8 +23,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
 
       - name: Install dependencies & Build
         run: |
@@ -71,3 +69,4 @@ jobs:
         with:
           app-name: 'native-chat-backend' # আপনার Azure Web App এর নাম
           package: .
+
