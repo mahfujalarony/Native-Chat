@@ -26,7 +26,7 @@ jobs:
 
       - name: Install dependencies & Build
         run: |
-          npm ci
+          npm install
           npm run build --if-present
 
       - name: Prepare Deployment Artifact
@@ -34,9 +34,9 @@ jobs:
           mkdir -p ../deploy-pkg
           cp -r dist ../deploy-pkg/
           cp package.json ../deploy-pkg/
-          cp package-lock.json ../deploy-pkg/
+          [ -f package-lock.json ] && cp package-lock.json ../deploy-pkg/ || true
           cd ../deploy-pkg
-          npm ci --omit=dev
+          npm install --omit=dev
 
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
